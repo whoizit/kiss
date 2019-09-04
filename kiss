@@ -383,6 +383,7 @@ pkg_tar() {
 }
 
 pkg_build() {
+    touch /tmp/kiss-build.log
     # Build packages and turn them into packaged tar-balls. This function
     # also checks checksums, downloads sources and ensure all dependencies
     # are installed.
@@ -503,7 +504,7 @@ pkg_build() {
         cd "$mak_dir/$pkg"
 
         # Call the build script.
-        "$repo_dir/build" "$pkg_dir/$pkg" || die "[$pkg] Build failed"
+        "$repo_dir/build" "$pkg_dir/$pkg" >>/tmp/kiss-build.log 2>&1 || die "[$pkg] Build failed"
 
         # Copy the repository files to the package directory.
         # This acts as the database entry.
@@ -761,7 +762,7 @@ pkg_install() {
 
         # This is repeated multiple times. Better to make it a function.
         pkg_rsync() {
-            rsync --chown=root:root -HKav --exclude etc -- \
+            rsync --chown=root:root -HKa --exclude etc -- \
                 "$tar_dir/$pkg_name/" "$KISS_ROOT/"
         }
 
